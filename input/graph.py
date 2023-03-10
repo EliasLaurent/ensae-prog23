@@ -212,19 +212,6 @@ def graph_from_file(filename):
 
 """g = graph_from_file("work/network.01.in")
 print(g)
-print(g.compco()) test"""
+print(g.compco())"""
 
 #TD2
-def kruskal(g):
-    puissances=[]
-    print(g.nodes)
-    for i in list(g.nodes):
-        puissances.append(g.graph[i][1])
-    return puissances
-from graph import Graph, graph_from_file
-import time
-data_path = "input/"
-file_name = "network.02.in"
-t0=time.perf_counter()
-g = graph_from_file(data_path + file_name)
-kruskal(g)
