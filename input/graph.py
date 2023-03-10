@@ -237,17 +237,20 @@ def fus(l1,l2):
     k2=0
     n=len(l1)
     m=len(l2)
-    ​while k1<m-1 and k2<n-1:
-        if l1[k1][0]<l1[k2][0]:
+    while k1<n and k2<m:
+        if l1[k1][0]<l2[k2][0]:
             l.append(l1[k1])
-
             k1=k1+1
         else:
-            l.append(l1[k2])
-
-            ​k2=k2+1
-
-
+            l.append(l2[k2])
+            k2=k2+1
+    while k1<n:
+        l.append(l1[k1])
+        k1=k1+1
+    while k2<m:
+        l.append(l2[k2])
+        k2=k2+1   
+    return(l)
 
 def trifus(l):
     n=len(l)
@@ -255,33 +258,35 @@ def trifus(l):
         return(l)
     else:
         m=n//2
-        return(fus(trifus(l[m:]),trifus(l[:m]))
+        return(fus(trifus(l[m:]),trifus(l[:m])))
 
 def kruskal(g):
     n=g.nb_nodes
     l=[]
     for n in g.nodes:
         for k in g.graph[n]:
-
-            l.append[n,k[0],k[1]]
+            l.append([k[1],n,k[0]])
+    print(l)
     l=trifus(l)
+    print(l)
     c=[]
     g2=Graph(range(1,n+1))
     v=range(1,n+1)
     for a in l:
         if v[a[1]]!=v[a[2]]:
-            g2.graph[a[1]].append([a[2],a[0],1)
-            g2.graph[a[2]].append([a[1],a[0],1)
+            g2.add_edge(a[1],a[2],a[0])
             g2.nb_edges+=1
-
             b=v[a[2]]
-
             for k in v:
-
-                if k=b:
-
+                if k==b:
                     k=v[a[1]]
+    return(g2)
 
-    ​return(g2)
-
-
+from graph import Graph, graph_from_file#, temps_trajets
+import time
+data_path = "input/"
+file_name = "network.02.in"
+#t0=time.perf_counter()
+g = graph_from_file(data_path + file_name)
+print(kruskal(g))
+print(g)
