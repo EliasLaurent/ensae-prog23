@@ -1,7 +1,7 @@
 class Graph:
     """
-    A class representing graphs as adjacency lists and implementing various algorithms on the graphs. Graphs in the class are not oriented. 
-    Attributes: 
+    A class representing graphs as adjacency lists and implementing various algorithms on the graphs. Graphs in the class are not oriented.
+    Attributes:
     -----------
     nodes: NodeType
         A list of nodes. Nodes can be of any immutable type, e.g., integer, float, or string.
@@ -13,13 +13,13 @@ class Graph:
     nb_nodes: int
         The number of nodes.
     nb_edges: int
-        The number of edges. 
+        The number of edges.
     """
 
     def __init__(self, nodes=[]):
         """
-        Initializes the graph with a set of nodes, and no edges. 
-        Parameters: 
+        Initializes the graph with a set of nodes, and no edges.
+        Parameters:
         -----------
         nodes: list, optional
             A list of nodes. Default is empty.
@@ -28,23 +28,23 @@ class Graph:
         self.graph = dict([(n, []) for n in nodes])
         self.nb_nodes = len(nodes)
         self.nb_edges = 0
-    
+
 
     def __str__(self):
         """Prints the graph as a list of neighbors for each node (one per line)"""
         if not self.graph:
-            output = "The graph is empty"            
+            output = "The graph is empty"
         else:
             output = f"The graph has {self.nb_nodes} nodes and {self.nb_edges} edges.\n"
             for source, destination in self.graph.items():
                 output += f"{source}-->{destination}\n"
         return output
-    
+
     def add_edge(self, node1, node2, power_min, dist=1):
         """
-        Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes. 
+        Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes.
 
-        Parameters: 
+        Parameters:
         -----------
         node1: NodeType
             First end (node) of the edge
@@ -67,15 +67,13 @@ class Graph:
         self.graph[node1].append((node2, power_min, dist))
         self.graph[node2].append((node1, power_min, dist))
         self.nb_edges += 1
-    
 
-    def get_path_with_power(self, src, dest, power):
-        raise NotImplementedError
-    
+
+
     def comp(self,l,lb,lv):
         if lv==[]:
             return(l,lb)
-        else:   
+        else:
             i=lv.pop()
             if lb[i-1]:
                 lb[i-1]=False
@@ -83,7 +81,7 @@ class Graph:
                 l.append(i)
                 lv+=b
             return(self.comp(l,lb,lv))
-            
+
     def compco(self):
         n=self.nb_nodes
         lb=[True for i in range(n)]
@@ -95,12 +93,39 @@ class Graph:
                 c.append(l1)
         return(c)
 
+    def connected_components_set(self):
+        n=self.nb_nodes
+        lb=[True for i in range(n)]
+        c=[]
+        for k in range(1,n+1):
+            l1,l2=self.comp([],lb,[k])
+            lb=l2
+            if l1!=[]:
+                c.append(frozenset(l1))
+        return(set(c))
+
     def min_power(self, src, dest):
         """
-        Should return path, min_power. 
+        Should return path, min_power.
         """
-        raise NotImplementedError
+        max_pow = 0
+        for n in self.nodes:
+            for (_, power, _) in self.graph[n]:
+                max_pow = max(max_pow, power)
 
+        path = None
+        a, b = 0, max_pow
+
+        while b > a:
+            pow = (a + b)//2
+            path = self.get_path_with_power(src, dest, pow)
+            if path is None:
+                a = pow + 1
+            else:
+                b = pow
+        if path is None :
+            path=self.get_path_with_power(src, dest, a)
+        return path, a
 
     def CCsommet(self,i):
         n=len(self.nodes)
@@ -119,14 +144,13 @@ class Graph:
         L=[]
         for i in self.nodes:
             L.append(self.CCsommet(i))
-        Lsansdouble = [] 
-        for i in L : 
-            if i not in Lsansdouble: 
-                Lsansdouble.append(i) 
+        Lsansdouble = []
+        for i in L :
+            if i not in Lsansdouble:
+                Lsansdouble.append(i)
         return(Lsansdouble)
 #3
-    def get_path_with_power(self,p,t):
-        debut,fin=t[0],t[1]
+    def get_path_with_power(self,debut,fin,p):
         n=len(self.nodes)
         visit=[0 for _ in range(n)]
         cc=self.compco()
@@ -149,8 +173,7 @@ class Graph:
                     L.append(trouple[0])
             if m!=[]:
                 M.append(m)
-            if L!=[]:    
-                print(L[0])
+            if L!=[]:
                 voisin=self.graph[L[0]]
         chemin=[]
         ind=0
@@ -165,11 +188,12 @@ class Graph:
                 b=M[l][0]
                 chemin.append(b)
         if len(chemin)>1:
+            chemin.reverse()
             return(chemin)
         else:
             return(None)
 
-        
+
 def graph_from_file(filename):
     with open(filename, "r") as file:
         n, m = map(int, file.readline().split())
@@ -190,6 +214,4 @@ def graph_from_file(filename):
 print(g)
 print(g.compco()) test"""
 
-
 #TD2
-
