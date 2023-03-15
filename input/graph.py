@@ -198,7 +198,7 @@ class Graph:
         for n in self.nodes:
             gn=[]
             for k in self.graph[n]:
-                if k[1]<p:
+                if k[1]<=p:
                     gn.append(k)
             self.graph[n]=gn
         cc=self.compco()
@@ -215,7 +215,7 @@ class Graph:
                     l1[index_d]=0
                     l2[index_d]=1
                     P=[debut]
-                    prédécesseur=[0 for k in range(n)]
+                    predecesseur=[0 for k in range(n)]
                     a=index_d
                     while l2!=[1 for i in range(n)]:
                         mind=float('inf')
@@ -228,22 +228,16 @@ class Graph:
                             index_noeud=c.index(arret[0])
                             if l2[index_noeud]==0 and l1[index_noeud]>l1[k]+arret[2]:
                                 l1[index_noeud]=l1[k]+arret[2]
-                                prédécesseur[index_noeud]=k
+                                predecesseur[index_noeud]=k
                         l2[k]=1
                     chemin=[index_f]
                     while chemin[-1]!=index_d:
-                        chemin.append(prédécesseur[chemin[-1]])
+                        chemin.append(predecesseur[chemin[-1]])
                     for noeud in chemin:
                         noeud=c[noeud]
+                    chemin.reverse()
                     return(chemin)
 
-    def get_path_with_powerQ5_2(self,p,t):
-    #pour que ce soit plus compréensible on construit le chemin de debut à fin mais le chemin renvoyé est de fin à debut
-    #si on veut le vrai chemin on a juste a inverser debut et fin
-        a=t[0]
-        t[0]=t[1]
-        t[1]=a
-        print(self.get_path_with_powerQ5(p, t))
 
 
 def graph_from_file(filename):
@@ -323,23 +317,23 @@ def kruskal(g):
     print(l)
     c=[]
     g2=Graph(range(1,n+1))
-    v=range(1,n+1)
+    v=[k for k in range(1,n+1)]
     for a in l:
+        print(v)
         if v[a[1]]!=v[a[2]]:
             g2.add_edge(a[1],a[2],a[0])
-            g2.nb_edges+=1
             b=v[a[2]]
-            for k in v:
-                if k==b:
-                    k=v[a[1]]
+            for k in range(n):
+                if v[k]==b:
+                    v[k]=v[a[1]]
     return(g2)
 
 
-"""from graph import Graph, graph_from_file#, temps_trajets
+from graph import Graph, graph_from_file#, temps_trajets
 import time
 data_path = "input/"
 file_name = "network.02.in"
 #t0=time.perf_counter()
 g = graph_from_file(data_path + file_name)
 print(kruskal(g))
-print(g)"""
+print(g)

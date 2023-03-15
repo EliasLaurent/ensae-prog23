@@ -24,4 +24,5 @@ while s<min(3,g.nb_edges):
         T.append((t1-t0)/k)
 print(sum(T)/len(T))
 print(T)"""
-g.get_path_with_powerQ5_2(5,[2,1])
+print(g)
+print(g.get_path_with_power(2, 1, 4))
