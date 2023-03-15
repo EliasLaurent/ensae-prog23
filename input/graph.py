@@ -44,7 +44,8 @@ class Graph:
                 l.append(i)
                 lv+=b
             return(self.comp(l,lb,lv))
-
+#la fonction compco renvoie les composantes connexes sous forme de liste de listes
+#et ne sert qu'à petre utilisée dans d'autres fonctions ultérieures
     def compco(self):
         n=self.nb_nodes
         lb=[True for i in range(n)]
@@ -56,6 +57,8 @@ class Graph:
                 c.append(l1)
         return(c)
 
+#la fonction connected_components_set renvoie les composantes connexes
+#au format voulu i.e. en set de frozensets
     def connected_components_set(self):
         n=self.nb_nodes
         lb=[True for i in range(n)]
@@ -85,8 +88,9 @@ class Graph:
         if chemin is None :
             chemin=self.get_path_with_power(debut, fin, a)
         return(chemin,a)
-
-    def CCsommet(self,i):
+#autre methode pour avoir les composantes connexes sans recursivite
+#ne pas prendre en compte
+    """def CCsommet(self,i):
         n=len(self.nodes)
         L=[]
         compconn=[0 for  _ in range(n)]
@@ -96,7 +100,7 @@ class Graph:
             voisin = L.pop(0)
             if compconn[voisin[0]-1]==0 :
                 compconn[voisin[0]-1]=1
-                L+=self.graph[voisin[0]] #ajout dans L des voisins de voisin
+                L+=self.graph[voisin[0]]
         return(compconn)
 
     def CConnexes(self):
@@ -107,8 +111,8 @@ class Graph:
         for i in L :
             if i not in Lsansdouble:
                 Lsansdouble.append(i)
-        return(Lsansdouble)
-#3
+        return(Lsansdouble)"""
+
     def get_path_with_power(self,debut,fin,p):
         n=len(self.nodes)
         visit=[0 for _ in range(n)]
@@ -290,9 +294,7 @@ def kruskal(g):
     for n in g.nodes:
         for k in g.graph[n]:
             l.append([k[1],n,k[0]])
-    print(l)
     l=trifus(l)
-    print(l)
     c=[]
     g2=Graph(range(1,n+1))
     v=[k for k in range(1,n+1)]
