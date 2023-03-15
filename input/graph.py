@@ -192,6 +192,106 @@ class Graph:
             return(chemin)
         else:
             return(None)
+    
+    def get_path_with_powerQ5(self,p,t):
+
+        debut,fin=t[0],t[1]
+
+        for n in self.nodes:
+
+            gn=[]
+
+            for k in self.graph[n]:
+
+                if k[1]<p:
+
+                    gn.append(k)
+
+            self.graph[n]=gn
+
+        cc=self.compco()
+
+        for c in cc:
+
+            if c.count(debut)==1:
+
+                if c.count(fin)==0:
+
+                    return None
+
+                else:
+
+                    index_d=c.index(debut)
+
+                    index_f=c.index(fin)
+
+                    n=len(c)
+
+                    l1=[float('inf') for i in range(n)]
+
+                    l2=[0 for i in range(n)]
+
+                    l1[index_d]=0
+
+                    l2[index_d]=1
+
+                    P=[debut]
+
+                    prédécesseur=[0 for k in range(n)]
+
+                    a=index_d
+
+                    while l2!=[1 for i in range(n)]:
+
+                        mind=float('inf')
+
+                        indmin=n+1
+
+                        for k in range(n):
+
+                            if l2[k]==0 and l1[k]<mind:
+
+                                mind=l1[k]
+
+                                indmin=k
+
+                        for arret in self.graph[c[k]]:
+
+                            index_noeud=c.index(arret[0])
+
+                            if l2[index_noeud]==0 and l1[index_noeud]>l1[k]+arret[2]:
+
+                                l1[index_noeud]=l1[k]+arret[2]
+
+                                prédécesseur[index_noeud]=k
+
+                        l2[k]=1
+
+                    chemin=[index_f]
+
+                    while chemin[-1]!=index_d:
+
+                        chemin.append(prédécesseur[chemin[-1]])
+
+                    for noeud in chemin:
+
+                        noeud=c[noeud]
+
+                    return(chemin)
+
+    def get_path_with_powerQ5_2(self,p,t):
+
+    #pour que ce soit plus compréensible on construit le chemin de debut à fin mais le chemin renvoyé est de fin à debut
+
+    #si on veut le vrai chemin on a juste a inverser debut et fin
+
+        a=t[0]
+
+        t[0]=t[1]
+
+        t[1]=a
+
+        return(self.get_path_with_powerQ5(p, t))
 
 
 def graph_from_file(filename):
@@ -282,11 +382,12 @@ def kruskal(g):
                     k=v[a[1]]
     return(g2)
 
-from graph import Graph, graph_from_file#, temps_trajets
+
+"""from graph import Graph, graph_from_file#, temps_trajets
 import time
 data_path = "input/"
 file_name = "network.02.in"
 #t0=time.perf_counter()
 g = graph_from_file(data_path + file_name)
 print(kruskal(g))
-print(g)
+print(g)"""
