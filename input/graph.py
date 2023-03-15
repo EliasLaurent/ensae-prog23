@@ -1,29 +1,6 @@
 class Graph:
-    """
-    A class representing graphs as adjacency lists and implementing various algorithms on the graphs. Graphs in the class are not oriented.
-    Attributes:
-    -----------
-    nodes: NodeType
-        A list of nodes. Nodes can be of any immutable type, e.g., integer, float, or string.
-        We will usually use a list of integers 1, ..., n.
-    graph: dict
-        A dictionnary that contains the adjacency list of each node in the form
-        graph[node] = [(neighbor1, p1, d1), (neighbor2, p2, d2), ...]
-        where p1 is the minimal power on the edge (node, neighbor1) and d1 is the distance on the edge
-    nb_nodes: int
-        The number of nodes.
-    nb_edges: int
-        The number of edges.
-    """
 
     def __init__(self, nodes=[]):
-        """
-        Initializes the graph with a set of nodes, and no edges.
-        Parameters:
-        -----------
-        nodes: list, optional
-            A list of nodes. Default is empty.
-        """
         self.nodes = nodes
         self.graph = dict([(n, []) for n in nodes])
         self.nb_nodes = len(nodes)
@@ -41,20 +18,6 @@ class Graph:
         return output
 
     def add_edge(self, node1, node2, power_min, dist=1):
-        """
-        Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes.
-
-        Parameters:
-        -----------
-        node1: NodeType
-            First end (node) of the edge
-        node2: NodeType
-            Second end (node) of the edge
-        power_min: numeric (int or float)
-            Minimum power on this edge
-        dist: numeric (int or float), optional
-            Distance between node1 and node2 on the edge. Default is 1.
-        """
         if node1 not in self.graph:
             self.graph[node1] = []
             self.nb_nodes += 1
@@ -108,24 +71,22 @@ class Graph:
         """
         Should return path, min_power.
         """
-        max_pow = 0
+        max_pow=0
         for n in self.nodes:
             for (_, power, _) in self.graph[n]:
                 max_pow = max(max_pow, power)
-
-        path = None
-        a, b = 0, max_pow
-
+        path=None
+        a,b=0,max_pow
         while b > a:
-            pow = (a + b)//2
-            path = self.get_path_with_power(src, dest, pow)
+            pow=(a+b)//2
+            path=self.get_path_with_power(src, dest, pow)
             if path is None:
-                a = pow + 1
+                a=pow+1
             else:
-                b = pow
+                b=pow
         if path is None :
             path=self.get_path_with_power(src, dest, a)
-        return path, a
+        return(path,a)
 
     def CCsommet(self,i):
         n=len(self.nodes)
@@ -192,8 +153,8 @@ class Graph:
             return(chemin)
         else:
             return(None)
-    
-    def get_path_with_powerQ5(self,p,t):
+
+    def dijkstra(self,p,t):
         debut,fin=t[0],t[1]
         for n in self.nodes:
             gn=[]
@@ -256,27 +217,46 @@ def graph_from_file(filename):
                 raise Exception("Format incorrect")
     return g
 
-"""g = graph_from_file("work/network.01.in")
-print(g)
-print(g.compco())"""
-"""import time
-#TD2
-def temps_trajets(g):
-    i=1
-    s=0
-    T=[]
-    while s<min(3,g.nb_edges):
-        if len(g.graph[i])==0:
-            i=i+1
-        else:
+
+import time
+def q10():
+    def routes_from_file(filename):
+        with open(filename, "r") as file:
+            n = int(file.readline())
+            L=[]
+            for k in range(n):
+                route = list(map(int, file.readline().split()))
+                debut,fin,power_min = route
+                L.append([debut,fin,power_min]) # will add dist=1 by default
+        return(L)
+
+    def temps_trajets(g,routes):
+        i=0
+        s=0
+        T=[]
+        while s<min(3,g.nb_edges):
+            route=routes[i]
             t0=time.perf_counter()
-            k=0
-            for lien in g.graph[i]:
-                g.min_power(i,lien[0])
-                k=k+1
+            g.min_power(route[0],route[1])
+            s=s+1
             t1=time.perf_counter()
-            T.append((t1-t0)/k)
-    print(sum(T)/len(T))"""
+            T.append(t1-t0)
+        return(sum(T)/len(T))
+
+    L=[]
+    for k in range(1,11):
+        data_path = "input/"
+        file_name1 = "network."+str(k)+".in"
+        file_name2 = "routes."+str(k)+".in"
+        g = graph_from_file(data_path + file_name1)
+        routes=routes_from_file(data_path + file_name2)
+        L.append(temps_trajets(g,routes))
+    return(sum(L))
+#renvoie RecursionError: maximun recusrion depth exceeded in comparison...
+#La méthode m'a l'air pourtant bonne
+
+
+#on implemente le trifusion pour pouvoir l'utiliser dans kruskal (permet de trier les arete par ordre croissant de puissance)
 def fus(l1,l2):
     l=[]
     k1=0
@@ -327,13 +307,3 @@ def kruskal(g):
                 if v[k]==b:
                     v[k]=v[a[1]]
     return(g2)
-
-
-from graph import Graph, graph_from_file#, temps_trajets
-import time
-data_path = "input/"
-file_name = "network.02.in"
-#t0=time.perf_counter()
-g = graph_from_file(data_path + file_name)
-print(kruskal(g))
-print(g)
