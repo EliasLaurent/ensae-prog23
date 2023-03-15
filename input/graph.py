@@ -67,26 +67,24 @@ class Graph:
                 c.append(frozenset(l1))
         return(set(c))
 
-    def min_power(self, src, dest):
-        """
-        Should return path, min_power.
-        """
+    def min_power(self, debut, fin):
+        #retourne chemin, puissance minimum
         max_pow=0
         for n in self.nodes:
             for (_, power, _) in self.graph[n]:
                 max_pow = max(max_pow, power)
-        path=None
+        chemin=None
         a,b=0,max_pow
         while b > a:
             pow=(a+b)//2
-            path=self.get_path_with_power(src, dest, pow)
-            if path is None:
+            chemin=self.get_path_with_power(debut, fin, pow)
+            if chemin is None:
                 a=pow+1
             else:
                 b=pow
-        if path is None :
-            path=self.get_path_with_power(src, dest, a)
-        return(path,a)
+        if chemin is None :
+            chemin=self.get_path_with_power(debut, fin, a)
+        return(chemin,a)
 
     def CCsommet(self,i):
         n=len(self.nodes)

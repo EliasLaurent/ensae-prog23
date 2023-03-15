@@ -4,9 +4,9 @@ data_path = "input/"
 file_name = "network.02.in"
 t0=time.perf_counter()
 g = graph_from_file(data_path + file_name)
-"""#q10
-#print(g.min_power(2,1))
-i=1
+#q10
+print(g.min_power(2,1))
+"""i=1
 s=0
 T=[]
 while s<min(3,g.nb_edges):
@@ -22,4 +22,4 @@ while s<min(3,g.nb_edges):
         t1=time.perf_counter()
         T.append((t1-t0)/k)
 print(sum(T)/len(T))"""
-print(q10())
+#print(q10())
