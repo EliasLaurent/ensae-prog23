@@ -32,20 +32,16 @@ class Graph:
         self.graph[node2].append((node1, power_min, dist))
         self.nb_edges += 1
         self.edges += [(node1,node2,power_min)]
+    
 
+    def comp(self,lb,cc,i):
+        if lb[i-1]:
+            cc.append(i)
+            lb[i-1]=False
+            b=[a for (a,a2,a3) in self.graph[i]]
+            for k in b:
+                self.comp(lb,cc,k)
 
-
-    def comp(self,l,lb,lv):
-        if lv==[]:
-            return(l,lb)
-        else:
-            i=lv.pop()
-            if lb[i-1]:
-                lb[i-1]=False
-                b=[a for (a,a2,a3) in self.graph[i]]
-                l.append(i)
-                lv+=b
-            return(self.comp(l,lb,lv))
 #la fonction compco renvoie les composantes connexes sous forme de liste de listes
 #et ne sert qu'à petre utilisée dans d'autres fonctions ultérieures
     def compco(self):
@@ -53,11 +49,12 @@ class Graph:
         lb=[True for i in range(n)]
         c=[]
         for k in range(1,n+1):
-            l1,l2=self.comp([],lb,[k])
-            lb=l2
-            if l1!=[]:
-                c.append(l1)
+            cc=[]
+            self.comp(lb,cc,k)
+            if cc!=[]:
+                c.append(cc)
         return(c)
+
 
 #la fonction connected_components_set renvoie les composantes connexes
 #au format voulu i.e. en set de frozensets
@@ -90,9 +87,10 @@ class Graph:
         if chemin is None :
             chemin=self.get_path_with_power(debut, fin, a)
         return(chemin,a)
+
 #autre methode pour avoir les composantes connexes sans recursivite
 #ne pas prendre en compte
-    def CCsommet(self,i):
+    """def CCsommet(self,i):
         n=len(self.nodes)
         L=[]
         compconn=[0 for  _ in range(n)]
@@ -121,7 +119,7 @@ class Graph:
                 if compconn[i]==1:
                     reelcompconn.append(i+1)
             liste_compconn.append(reelcompconn)
-        return(liste_compconn)
+        return(liste_compconn)"""
 
     def get_path_with_power(self,debut,fin,p):
         n=len(self.nodes)
@@ -166,7 +164,8 @@ class Graph:
         else:
             return(None)
 
-    def dijkstra(self,p,t):
+#marche pas
+    def path_dijkstra(self,p,t):
         debut,fin=t[0],t[1]
         for n in self.nodes:
             gn=[]
@@ -186,7 +185,6 @@ class Graph:
                     l1=[float('inf') for i in range(n)]
                     l2=[0 for i in range(n)]
                     l1[index_d]=0
-                    l2[index_d]=1
                     P=[debut]
                     predecesseur=[0 for k in range(n)]
                     a=index_d
@@ -197,17 +195,17 @@ class Graph:
                             if l2[k]==0 and l1[k]<mind:
                                 mind=l1[k]
                                 indmin=k
-                        for arret in self.graph[c[k]]:
-                            index_noeud=c.index(arret[0])
-                            if l2[index_noeud]==0 and l1[index_noeud]>l1[k]+arret[2]:
-                                l1[index_noeud]=l1[k]+arret[2]
-                                predecesseur[index_noeud]=k
-                        l2[k]=1
+                        for arete in self.graph[c[indmin]]:
+                            index_noeud=c.index(arete[0])
+                            if l2[index_noeud]==0 and l1[index_noeud]>l1[indmin]+arete[2]:
+                                l1[index_noeud]=l1[indmin]+arete[2]
+                                predecesseur[index_noeud]=indmin
+                        l2[indmin]=1
                     chemin=[index_f]
                     while chemin[-1]!=index_d:
                         chemin.append(predecesseur[chemin[-1]])
-                    for noeud in chemin:
-                        noeud=c[noeud]
+                    for k in range(len(chemin)):
+                        chemin[k]=c[chemin[k]]
                     chemin.reverse()
                     return(chemin)
 
@@ -229,6 +227,8 @@ def graph_from_file(filename):
     return g
 
 
+
+#met 15 ans à s'executer, trop long...
 import time
 def q10():
     def routes_from_file(filename):
@@ -263,8 +263,7 @@ def q10():
         routes=routes_from_file(data_path + file_name2)
         L.append(temps_trajets(g,routes))
     return(sum(L))
-#renvoie RecursionError: maximun recusrion depth exceeded in comparison...
-#La méthode m'a l'air pourtant bonne
+
 
 
 #on implemente le trifusion pour pouvoir l'utiliser dans kruskal (permet de trier les arete par ordre croissant de puissance)
