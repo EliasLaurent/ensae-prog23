@@ -50,3 +50,4 @@ print(sum(T)/len(T))"""
 test()"""
 #print(g.compco())
 print(g.path_dijkstra(5, [1,2]))
+print(g.compco())

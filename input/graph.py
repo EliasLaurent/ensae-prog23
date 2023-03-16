@@ -34,23 +34,23 @@ class Graph:
         self.edges += [(node1,node2,power_min)]
     
 
-    def comp(self,lb,cc,i):
-        if lb[i-1]:
+    def comp(self,visité,cc,i):
+        if visité[i-1]:
             cc.append(i)
-            lb[i-1]=False
-            b=[a for (a,a2,a3) in self.graph[i]]
-            for k in b:
-                self.comp(lb,cc,k)
+            visité[i-1]=False
+            voisins=[a for (a,a2,a3) in self.graph[i]]
+            for k in voisins:
+                self.comp(visité,cc,k)
 
 #la fonction compco renvoie les composantes connexes sous forme de liste de listes
 #et ne sert qu'à petre utilisée dans d'autres fonctions ultérieures
     def compco(self):
         n=self.nb_nodes
-        lb=[True for i in range(n)]
+        visité=[True for i in range(n)]
         c=[]
         for k in range(1,n+1):
             cc=[]
-            self.comp(lb,cc,k)
+            self.comp(visité,cc,k)
             if cc!=[]:
                 c.append(cc)
         return(c)
@@ -164,7 +164,7 @@ class Graph:
         else:
             return(None)
 
-#marche pas
+
     def path_dijkstra(self,p,t):
         debut,fin=t[0],t[1]
         for n in self.nodes:
@@ -173,12 +173,15 @@ class Graph:
                 if k[1]<=p:
                     gn.append(k)
             self.graph[n]=gn
+            #on ne prend  que en compte les arete de poid inferieur à p
         cc=self.compco()
         for c in cc:
+            #on cherche si une composante conexe avec nos 2 sommets existe
             if c.count(debut)==1:
                 if c.count(fin)==0:
                     return None
                 else:
+                    #on s'inspire de l'algorithme de dijkstra
                     index_d=c.index(debut)
                     index_f=c.index(fin)
                     n=len(c)
@@ -204,6 +207,7 @@ class Graph:
                     chemin=[index_f]
                     while chemin[-1]!=index_d:
                         chemin.append(predecesseur[chemin[-1]])
+                    #on réindex par rapport au sommet du vrai graphe et non de la composante 
                     for k in range(len(chemin)):
                         chemin[k]=c[chemin[k]]
                     chemin.reverse()
@@ -306,6 +310,7 @@ def kruskal(g):
     c=[]
     g2=Graph(range(1,n+1))
     v=[k for k in range(1,n+1)]
+    #les sommets n1 et n2 sont reliés si v[n1]=v[n2], au debut aucun est relié
     for a in l:
         if v[a[1]-1]!=v[a[2]-1]:
             g2.add_edge(a[1],a[2],a[0])
@@ -323,8 +328,8 @@ g = graph_from_file(data_path + file_name)
  
 def Q14(graph,n1,n2):
     g=kruskal(graph)
-    parents={}
-    profondeurs={1:0}
+    parents={}#dictionnaire qui a un noeud associe le noeud antérieur et le puissance necessaire
+    profondeurs={1:0}#associe a un noeud sa profondeur par rapport a la racine
     def remplissage_dictonnaire(n):
         if not(n1 in parents and n2 in parents):
             for arete in g.graph[n]:
@@ -333,8 +338,10 @@ def Q14(graph,n1,n2):
                     profondeurs[arete[0]]=profondeurs[n]+1
                     remplissage_dictonnaire(arete[0])
     remplissage_dictonnaire(1)
+    #on prend le sommet 1 comme la racine de l'arbre
     chemin=[n1,n2]
     poids=[]
+    #on veut se ramener a un probleme ou nos 2 noeuds sont a la meme profondeur
     while profondeurs[n1]!=profondeurs[n2]:
         if profondeurs[n1]<profondeurs[n2]:
             if parents[n2][0]!=n1:
@@ -346,6 +353,7 @@ def Q14(graph,n1,n2):
                 chemin.insert(-1,parents[n1][0])
             poids.append(parents[n1][1])
             n1=parents[n1][0]
+    #une fois que nos deux noeuds sont a la meme profondeur on a juste a remonter simultanément dans l'arbre jusqu'a trouver un ancetre commun
     while n1!=n2:
         k=chemin.index(n1)
         if parents[n2][0]!= parents[n1][0]:
