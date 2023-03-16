@@ -202,39 +202,6 @@ class Graph:
                         noeud=c[noeud]
                     chemin.reverse()
                     return(chemin)
-#code temporaire copié de Matéo pour faire fonctionner la question 14
-    def kruskal(self):
-        g_mst = Graph(self.nodes)
-        aretes = sorted(self.edges, key=lambda x: x[2])
-        dic = dict([(node, [node, 0]) for node in g_mst.nodes])
-
-        def find(x):
-            while x != dic[x][0]:
-                x = dic[x][0]
-            return x
-
-        def union(x, y):
-            rx = find(x)
-            ry = find(y)
-            rank_rx = dic[rx][1]
-            rank_ry = dic[ry][1]
-            if rank_rx > rank_ry:
-                dic[ry][0] = rx
-            else:
-                dic[rx][0] = ry
-                if rank_rx == rank_ry:
-                    dic[ry][1] += 1
-    
-        for arete in aretes:
-            x = arete[0]
-            y = arete[1]
-            if find(x) != find(y):
-                pow_min = arete[2]
-                g_mst.add_edge(x, y, pow_min)
-                union(x, y)
-        racine = find(g_mst.nodes[0])
-        return g_mst,racine
-
 
 
 def graph_from_file(filename):
@@ -321,7 +288,7 @@ def trifus(l):
     else:
         m=n//2
         return(fus(trifus(l[m:]),trifus(l[:m])))
-
+#notre kruskal
 def kruskal(g):
     n=g.nb_nodes
     l=[]
@@ -333,13 +300,12 @@ def kruskal(g):
     g2=Graph(range(1,n+1))
     v=[k for k in range(1,n+1)]
     for a in l:
-        print(v)
-        if v[a[1]]!=v[a[2]]:
+        if v[a[1]-1]!=v[a[2]-1]:
             g2.add_edge(a[1],a[2],a[0])
-            b=v[a[2]]
+            b=v[a[2]-1]
             for k in range(n):
                 if v[k]==b:
-                    v[k]=v[a[1]]
+                    v[k]=v[a[1]-1]
     return(g2)
 
 import time
@@ -349,7 +315,7 @@ file_name = "network.05.in"
 g = graph_from_file(data_path + file_name)
  
 def Q14(graph,n1,n2):
-    g=graph.kruskal()[0]
+    g=kruskal(graph)
     parents={}
     profondeurs={1:0}
     def remplissage_dictonnaire(n):
@@ -360,15 +326,17 @@ def Q14(graph,n1,n2):
                     profondeurs[arete[0]]=profondeurs[n]+1
                     remplissage_dictonnaire(arete[0])
     remplissage_dictonnaire(1)
-    chemin=[]
+    chemin=[n1,n2]
     poids=[]
     while profondeurs[n1]!=profondeurs[n2]:
-        if profondeurs[n1]>profondeurs[n2]:
-            chemin.insert(0,parents[n2][0])
+        if profondeurs[n1]<profondeurs[n2]:
+            if parents[n2][0]!=n1:
+                chemin.insert(1,parents[n2][0])
             poids.append(parents[n2][1])
             n2=parents[n2][0]
-        elif profondeurs[n1]<profondeurs[n2]:
-            chemin.insert(0,parents[n1])
+        elif profondeurs[n1]>profondeurs[n2]:
+            if parents[n1][0]!=n2:
+                chemin.insert(-1,parents[n1][0])
             poids.append(parents[n1][1])
             n1=parents[n1][0]
     while n1!=n2:
@@ -376,11 +344,13 @@ def Q14(graph,n1,n2):
         if parents[n2][0]!= parents[n1][0]:
             chemin.insert(k+1,parents[n2][0])
             chemin.insert(k+1,parents[n1][0])
+        else:
+            chemin.insert(k+1,parents[n1][0])
         poids.append(parents[n2][1])
         poids.append(parents[n1][1])
         n1=parents[n1][0]
         n2=parents[n2][0]
-    k=chemin.index(n1)
-    chemin.insert(k+1,parents[n1][0])
-    p=min(poids)
+    p=max(poids)
     return(p,chemin)
+
+print(Q14(g, 2, 1))
