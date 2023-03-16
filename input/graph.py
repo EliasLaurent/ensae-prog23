@@ -60,14 +60,15 @@ class Graph:
 #au format voulu i.e. en set de frozensets
     def connected_components_set(self):
         n=self.nb_nodes
-        lb=[True for i in range(n)]
+        visité=[True for i in range(n)]
         c=[]
         for k in range(1,n+1):
-            l1,l2=self.comp([],lb,[k])
-            lb=l2
-            if l1!=[]:
-                c.append(frozenset(l1))
+            cc=[]
+            self.comp(visité,cc,k)
+            if cc!=[]:
+                c.append(frozenset(cc))
         return(set(c))
+
 
     def min_power(self, debut, fin):
         #retourne chemin, puissance minimum

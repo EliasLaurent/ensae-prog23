@@ -49,5 +49,4 @@ print(sum(T)/len(T))"""
     print(temps_trajets(g,routes))
 test()"""
 #print(g.compco())
-print(g.path_dijkstra(5, [1,2]))
-print(g.compco())
+print(g.connected_components_set())
