@@ -92,7 +92,7 @@ class Graph:
         return(chemin,a)
 #autre methode pour avoir les composantes connexes sans recursivite
 #ne pas prendre en compte
-    """def CCsommet(self,i):
+    def CCsommet(self,i):
         n=len(self.nodes)
         L=[]
         compconn=[0 for  _ in range(n)]
@@ -105,6 +105,7 @@ class Graph:
                 L+=self.graph[voisin[0]]
         return(compconn)
 
+
     def CConnexes(self):
         L=[]
         for i in self.nodes:
@@ -113,12 +114,19 @@ class Graph:
         for i in L :
             if i not in Lsansdouble:
                 Lsansdouble.append(i)
-        return(Lsansdouble)"""
+        liste_compconn=[]
+        for compconn in Lsansdouble:
+            reelcompconn=[]
+            for i in range(len(compconn)):
+                if compconn[i]==1:
+                    reelcompconn.append(i+1)
+            liste_compconn.append(reelcompconn)
+        return(liste_compconn)
 
     def get_path_with_power(self,debut,fin,p):
         n=len(self.nodes)
         visit=[0 for _ in range(n)]
-        cc=self.compco()
+        cc=self.CConnexes()
         for c in cc:
             if c.count(debut)==1:
                 if c.count(fin)==0:
@@ -237,7 +245,7 @@ def q10():
         i=0
         s=0
         T=[]
-        while s<min(3,g.nb_edges):
+        while s<min(5,g.nb_edges):
             route=routes[i]
             t0=time.perf_counter()
             g.min_power(route[0],route[1])
@@ -288,7 +296,7 @@ def trifus(l):
     else:
         m=n//2
         return(fus(trifus(l[m:]),trifus(l[:m])))
-#notre kruskal
+
 def kruskal(g):
     n=g.nb_nodes
     l=[]
@@ -353,4 +361,4 @@ def Q14(graph,n1,n2):
     p=max(poids)
     return(p,chemin)
 
-print(Q14(g, 2, 1))
+#print(Q14(g, 2, 1))

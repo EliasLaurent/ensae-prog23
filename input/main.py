@@ -1,7 +1,7 @@
-from graph import Graph, graph_from_file, kruskal
+from graph import Graph, graph_from_file, kruskal, q10
 import time
 data_path = "input/"
-file_name = "network.1.in"
+file_name = "network.2.in"
 t0=time.perf_counter()
 g = graph_from_file(data_path + file_name)
 #q10
@@ -22,4 +22,29 @@ while s<min(3,g.nb_edges):
         T.append((t1-t0)/k)
 print(sum(T)/len(T))"""
 #print(q10())
-print(g)
+def test():
+    def routes_from_file(filename):
+        with open(filename, "r") as file:
+            n = int(file.readline())
+            L=[]
+            for k in range(n):
+                route = list(map(int, file.readline().split()))
+                debut,fin,power_min = route
+                L.append([debut,fin,power_min]) # will add dist=1 by default
+        return(L)
+
+    def temps_trajets(g,routes):
+        i=0
+        s=0
+        T=[]
+        while s<min(5,g.nb_edges):
+            route=routes[i]
+            t0=time.perf_counter()
+            g.min_power(route[0],route[1])
+            s=s+1
+            t1=time.perf_counter()
+            T.append(t1-t0)
+        return(sum(T)/len(T))
+    routes=routes_from_file(data_path+"routes.2.in")
+    print(temps_trajets(g,routes))
+test()
