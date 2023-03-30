@@ -321,11 +321,11 @@ def kruskal(g):
                     v[k]=v[a[1]-1]
     return(g2)
 
-import time
+"""import time
 data_path = "input/"
 file_name = "network.05.in"
 #t0=time.perf_counter()
-g = graph_from_file(data_path + file_name)
+g = graph_from_file(data_path + file_name)"""
  
 def Q14(graph,n1,n2):
     g=kruskal(graph)
