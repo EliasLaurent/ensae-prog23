@@ -321,7 +321,7 @@ def kruskal(g):
                     v[k]=v[a[1]-1]
     return(g2)
 
-"""import time
+"""test : import time
 data_path = "input/"
 file_name = "network.05.in"
 #t0=time.perf_counter()
@@ -369,5 +369,61 @@ def Q14(graph,n1,n2):
     p=max(poids)
     return(p,chemin)
 
-#print(Q14(g, 2, 1))
-#test
+#test : print(Q14(g, 2, 1))
+
+#Q18
+def routes_from_file(x):
+    with open("input/routes."+str(x)+".in", "r") as file:
+        n = int(file.readline())
+        L=[]
+        for k in range(n):
+            route = list(map(int, file.readline().split()))
+            debut,fin,profit = route
+            L.append([debut,fin,profit])
+    g=graph_from_file("input/network."+str(x)+".in")
+    for route in L:
+        for arete in g.edges:
+            if (debut==arete[0] and fin==arete[1]) or (debut==arete[1] and fin==arete[0]):
+                route.append(arete[2])
+    return(L)
+
+g=graph_from_file("input/network.1.in")
+"""print(routes_from_file(1))
+print(g.edges[1][1])"""
+def trucks_from_file(filename):
+    with open(filename, "r") as file:
+        n = int(file.readline())
+        L=[]
+        for k in range(n):
+            truck = list(map(int, file.readline().split()))
+            pow,cout = truck
+            L.append([pow,cout])
+    return(L)
+
+#test : print(trucks_from_file("input/trucks.2.in"))
+
+"""def cout_route(route):
+    pow=route[2]"""
+#q18 a chauque trajet ona ssocie le prix min du camion qui peut le faire puis on resoud programmation dynamique
+
+def q18(graph,camions,trajets,budjet):
+    #camions est une liste de doublet(puissance,prix)
+    #trajet est une liste de triplet(debut,fin,profit)
+    l=[]
+    for t in trajets:
+        pmin,chemin=Q14(graph,t[0],t[1])
+        l.append((pmin,chemin,t[2]))
+    l2=[]
+    for chemin in l:
+        prixmin=np.inf
+        indice=np.inf
+        for k in range(len(camions)):
+            if camions[k][0]>=chemin[0]:
+                if camions[k][1]<prixmin:
+                    prixmin=camions[k][1]
+                    indice=k
+        l2.append(prixmin,chemin[2],k,chemin[1])
+    return(l2)
+    #l2 est une liste de quadruplet de la forme(prix,profit,camion,chemin)
+    #on doit maintenant resoudre le probleme du sac a dos sur les 2 premier element de chaque quadruplet​
+print(q18(g,trucks_from_file("input/trucks.1.in"),routes_from_file(1),25000000))
