@@ -427,3 +427,91 @@ def q18(graph,camions,trajets,budjet):
     #l2 est une liste de quadruplet de la forme(prix,profit,camion,chemin)
     #on doit maintenant resoudre le probleme du sac a dos sur les 2 premier element de chaque quadruplet​
 print(q18(g,trucks_from_file("input/trucks.1.in"),routes_from_file(1),25000000))
+
+import numpy as np
+
+#q18 a chaque trajet on associe le prix min du camion qui peut le faire puis on resoud programmation dynamique
+def q18progdynamique(graph,camions,trajets,budjet):
+    #camions est une liste de doublet(puissance,prix)
+    #trajets est une liste de triplet(debut,fin,profit)
+    l=[]
+    for t in trajets:
+        pmin,chemin=Q14(graph,t[0],t[1])
+        l.append((pmin,chemin,t[2]))
+    l2=[]
+    for chemin in l:
+        prixmin=np.inf
+        indice=np.inf
+        for k in range(len(camions)):
+            if camions[k][0]>=chemin[0]:
+                if camions[k][1]<prixmin:
+                    prixmin=camions[k][1]
+                    indice=k
+        l2.append(prixmin,chemin[2],indice,chemin[1])
+    #l2 est une liste de quadruplet de la forme (prix,profit,camion,chemin) de chaque trajet
+    #on doit maintenant resoudre le probleme du sac a dos sur les 2 premiers elements de chaque quadruplet
+    #je suppose que le budjet, les prix et les profits sont des entiers
+    T=[[(0,[]) for i in range(budjet+1)] for i in range(len(l2)+1)]
+    """"T[i][j] represente le profit optimum et la liste des trajets a prendre
+    si on peut faire que les i premiers trajets avec un budjet de j"""
+    for i in range(1,len(l2)+1):
+        for b in range(budjet+1):
+            #on utilise la formule de recurrence
+            if b>l2[i][0]:
+                if T[i-1][b][0]>=T[i-1][b-l2[i][0]][0]+l2[i][1]:
+                    T[i][b]=T[i-1][b]
+                else:
+                    T[i][b]=(T[i-1][b-l2[i][0]][0]+l2[i][1],T[i-1][b-l2[i][0]][1]+[i])
+            else:
+                T[i][b]=T[i-1][b]
+    opti=T[len(l2)+1][budjet+1][1]
+    sol=[]
+    for trajet in opti:
+        sol.append(l2[trajet][2],trajets[trajet])
+    return(sol)
+
+def q18greedy(graph,camions,trajets,budjet):#la solution retournée n'est pas forcement optimale
+    l=[]
+    for t in trajets:
+        pmin,chemin=Q14(graph,t[0],t[1])
+        l.append((pmin,chemin,t[2]))
+    l2=[]
+    for chemin in l:
+        prixmin=np.inf
+        indice=np.inf
+        for k in range(len(camions)):
+            if camions[k][0]>=chemin[0]:
+                if camions[k][1]<prixmin:
+                    prixmin=camions[k][1]
+                    indice=k
+        l2.append(prixmin,chemin[2],indice,chemin[1])
+    #l2 est une liste de quadruplet de la forme (prix,profit,camion,chemin) de chaque trajet
+    #on va maintenant trier les trajet de maniere decroissante en fonction de leur rapport profit/prix
+    lefficacite=[]
+    for i in range(len(l2)):
+        lefficacite.append((i,l2[i][1]/l2[i][0]))
+    #on tri l'efficacite en fonction de son 2eme parametre
+    def triFusion(L):
+        if len(L) == 1:
+            return L
+        else:
+            return fusion( triFusion(L[:len(L)//2]) , triFusion(L[len(L)//2:]) )
+
+    def fusion(A,B):
+        if len(A) == 0:
+            return B
+        elif len(B) == 0:
+            return A
+        elif A[0][1]>= B[0][1]:
+            return [A[0]] + fusion( A[1:] , B )
+        else:
+            return [B[0]] + fusion( A , B[1:] )
+    lefficacite=triFusion(lefficacite)
+    #on fait en priorite les trajets avec le meilleur rapport profit/cout
+    b=budjet
+    sol=[]
+    for trajet in lefficacite:
+        if l2[trajet[0]][0]<=b:
+            sol.append(l2[trajet][2],trajets[trajet])
+            b-=l2[trajet[0]][0]
+    return(sol)
