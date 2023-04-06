@@ -231,10 +231,9 @@ def graph_from_file(filename):
     return g
 
 
-
-#met 15 ans à s'executer, trop long...
 import time
-def q10():
+
+def q10():#met 15 ans à s'executer, trop long...
     def routes_from_file(filename):
         with open(filename, "r") as file:
             n = int(file.readline())
@@ -270,7 +269,7 @@ def q10():
 
 
 
-#on implemente le trifusion pour pouvoir l'utiliser dans kruskal (permet de trier les arete par ordre croissant de puissance)
+#on implemente le trifusion pour pouvoir l'utiliser dans kruskal (permet de trier les aretes par ordre croissant de puissance)
 def fus(l1,l2):
     l=[]
     k1=0
@@ -320,53 +319,51 @@ def kruskal(g):
                     v[k]=v[a[1]-1]
     return(g2)
 
-"""test : import time
-data_path = "input/"
-file_name = "network.05.in"
-#t0=time.perf_counter()
-g = graph_from_file(data_path + file_name)"""
  
 def Q14(graph,n1,n2):
-    g=kruskal(graph)
-    parents={}#dictionnaire qui a un noeud associe le noeud antérieur et le puissance necessaire
-    profondeurs={1:0}#associe a un noeud sa profondeur par rapport a la racine
-    def remplissage_dictonnaire(n):
-        if not(n1 in parents and n2 in parents):
-            for arete in g.graph[n]:
-                if not(arete[0] in parents):
-                    parents[arete[0]]=(n,arete[1])
-                    profondeurs[arete[0]]=profondeurs[n]+1
-                    remplissage_dictonnaire(arete[0])
-    remplissage_dictonnaire(1)
-    #on prend le sommet 1 comme la racine de l'arbre
-    chemin=[n1,n2]
-    poids=[]
-    #on veut se ramener a un probleme ou nos 2 noeuds sont a la meme profondeur
-    while profondeurs[n1]!=profondeurs[n2]:
-        if profondeurs[n1]<profondeurs[n2]:
-            if parents[n2][0]!=n1:
-                chemin.insert(1,parents[n2][0])
+    if n1==n2:
+        return(0,[])
+    else:
+        g=kruskal(graph)
+        parents={}#dictionnaire qui a un noeud associe le noeud antérieur et le puissance necessaire
+        profondeurs={1:0}#associe a un noeud sa profondeur par rapport a la racine
+        def remplissage_dictonnaire(n):
+            if not(n1 in parents and n2 in parents):
+                for arete in g.graph[n]:
+                    if not(arete[0] in parents):
+                        parents[arete[0]]=(n,arete[1])
+                        profondeurs[arete[0]]=profondeurs[n]+1
+                        remplissage_dictonnaire(arete[0])
+        remplissage_dictonnaire(1)
+        #on prend le sommet 1 comme la racine de l'arbre
+        chemin=[n1,n2]
+        poids=[]
+        #on veut se ramener a un probleme ou nos 2 noeuds sont a la meme profondeur
+        while profondeurs[n1]!=profondeurs[n2]:
+            if profondeurs[n1]<profondeurs[n2]:
+                if parents[n2][0]!=n1:
+                    chemin.insert(1,parents[n2][0])
+                poids.append(parents[n2][1])
+                n2=parents[n2][0]
+            elif profondeurs[n1]>profondeurs[n2]:
+                if parents[n1][0]!=n2:
+                    chemin.insert(-1,parents[n1][0])
+                poids.append(parents[n1][1])
+                n1=parents[n1][0]
+        #une fois que nos deux noeuds sont a la meme profondeur on a juste a remonter simultanément dans l'arbre jusqu'a trouver un ancetre commun
+        while n1!=n2:
+            k=chemin.index(n1)
+            if parents[n2][0]!= parents[n1][0]:
+                chemin.insert(k+1,parents[n2][0])
+                chemin.insert(k+1,parents[n1][0])
+            else:
+             chemin.insert(k+1,parents[n1][0])
             poids.append(parents[n2][1])
-            n2=parents[n2][0]
-        elif profondeurs[n1]>profondeurs[n2]:
-            if parents[n1][0]!=n2:
-                chemin.insert(-1,parents[n1][0])
             poids.append(parents[n1][1])
             n1=parents[n1][0]
-    #une fois que nos deux noeuds sont a la meme profondeur on a juste a remonter simultanément dans l'arbre jusqu'a trouver un ancetre commun
-    while n1!=n2:
-        k=chemin.index(n1)
-        if parents[n2][0]!= parents[n1][0]:
-            chemin.insert(k+1,parents[n2][0])
-            chemin.insert(k+1,parents[n1][0])
-        else:
-            chemin.insert(k+1,parents[n1][0])
-        poids.append(parents[n2][1])
-        poids.append(parents[n1][1])
-        n1=parents[n1][0]
-        n2=parents[n2][0]
-    p=max(poids)
-    return(p,chemin)
+            n2=parents[n2][0]
+        p=max(poids)
+        return(p,chemin)
 
 #test : print(Q14(g, 2, 1))
 
@@ -438,7 +435,7 @@ def q18violente(x):
             L=L_perm
     return(L)
 
-#q18 a chaque trajet on associe le prix min du camion qui peut le faire puis on resoud programmation dynamique
+
 
 import numpy as np
 
@@ -459,7 +456,7 @@ def q18progdynamique(graph,camions,trajets,budjet):
                 if camions[k][1]<prixmin:
                     prixmin=camions[k][1]
                     indice=k
-        l2.append(prixmin,chemin[2],indice,chemin[1])
+        l2.append((prixmin,chemin[2],indice,chemin[1]))
     #l2 est une liste de quadruplet de la forme (prix,profit,camion,chemin) de chaque trajet
     #on doit maintenant resoudre le probleme du sac a dos sur les 2 premiers elements de chaque quadruplet
     #je suppose que le budjet, les prix et les profits sont des entiers
@@ -479,7 +476,7 @@ def q18progdynamique(graph,camions,trajets,budjet):
     opti=T[len(l2)+1][budjet+1][1]
     sol=[]
     for trajet in opti:
-        sol.append(l2[trajet][2],trajets[trajet])
+        sol.append((l2[trajet][2],trajets[trajet]))
     return(sol)
 
 def q18greedy(graph,camions,trajets,budjet):#la solution retournée n'est pas forcement optimale
@@ -496,9 +493,9 @@ def q18greedy(graph,camions,trajets,budjet):#la solution retournée n'est pas fo
                 if camions[k][1]<prixmin:
                     prixmin=camions[k][1]
                     indice=k
-        l2.append(prixmin,chemin[2],indice,chemin[1])
+        l2.append((prixmin,chemin[2],indice,chemin[1]))
     #l2 est une liste de quadruplet de la forme (prix,profit,camion,chemin) de chaque trajet
-    #on va maintenant trier les trajets de maniere decroissante en fonction de leur rapport profit/prix
+    #on va maintenant trier les trajet de maniere decroissante en fonction de leur rapport profit/prix
     lefficacite=[]
     for i in range(len(l2)):
         lefficacite.append((i,l2[i][1]/l2[i][0]))
@@ -528,4 +525,5 @@ def q18greedy(graph,camions,trajets,budjet):#la solution retournée n'est pas fo
             b-=l2[trajet[0]][0]
     return(sol)
 
-#print(Q14(g, 7, 35867))
+
+#print(q18progdynamique(g,trucks_from_file("/home/onyxia/ensae-prog23/ensae-prog23/input/trucks.1.in"),routes_from_file(1),25000000))

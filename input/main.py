@@ -50,3 +50,4 @@ print(sum(T)/len(T))"""
 test()"""
 #print(g.compco())
 print(g.connected_components_set())
+print(sorted([7,2,0,8,3,3]))
