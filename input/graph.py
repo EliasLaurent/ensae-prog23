@@ -387,7 +387,7 @@ def routes_from_file(x):
                 route.append(arete[2])
     return(L)
 
-g=graph_from_file("input/network.1.in")
+g=graph_from_file("input/network.2.in")
 """print(routes_from_file(1))
 print(g.edges[1][1])"""
 def trucks_from_file(filename):
@@ -396,37 +396,50 @@ def trucks_from_file(filename):
         L=[]
         for k in range(n):
             truck = list(map(int, file.readline().split()))
-            pow,cout = truck
-            L.append([pow,cout])
+            puissance,cout = truck
+            L.append([puissance,cout])
     return(L)
 
 #test : print(trucks_from_file("input/trucks.2.in"))
 
-"""def cout_route(route):
-    pow=route[2]"""
-#q18 a chauque trajet ona ssocie le prix min du camion qui peut le faire puis on resoud programmation dynamique
+def cout_route(route,x): #a une route du fichier network.x.in on associe le cout minimal pour la traverser
+    g=graph_from_file("input/network."+str(x)+".in")
+    pow=g.min_power(route[0],route[1])[1]
+    trucks=trucks_from_file("input/trucks."+str(x)+".in")
+    cout=10**10 #je suppose qu'aucun camion d'aucun fichier n'a un prix superieur a 10**10
+    best_truck=[]
+    for truck in trucks:
+        if truck[0]>=pow and truck[1]<cout:
+            cout=truck[1]
+            best_truck=truck
+    return(cout,best_truck)
 
-def q18(graph,camions,trajets,budjet):
-    #camions est une liste de doublet(puissance,prix)
-    #trajet est une liste de triplet(debut,fin,profit)
-    l=[]
-    for t in trajets:
-        pmin,chemin=Q14(graph,t[0],t[1])
-        l.append((pmin,chemin,t[2]))
-    l2=[]
-    for chemin in l:
-        prixmin=np.inf
-        indice=np.inf
-        for k in range(len(camions)):
-            if camions[k][0]>=chemin[0]:
-                if camions[k][1]<prixmin:
-                    prixmin=camions[k][1]
-                    indice=k
-        l2.append(prixmin,chemin[2],k,chemin[1])
-    return(l2)
-    #l2 est une liste de quadruplet de la forme(prix,profit,camion,chemin)
-    #on doit maintenant resoudre le probleme du sac a dos sur les 2 premier element de chaque quadruplet​
-print(q18(g,trucks_from_file("input/trucks.1.in"),routes_from_file(1),25000000))
+import itertools
+
+def q18grosbourrin(x):
+    camions=trucks_from_file("input/trucks."+str(x)+".in")
+    routes=routes_from_file(x)
+    permutations=list(itertools.permutations(routes))
+    profit_max=0
+    cout_min=10**10
+    L=[]
+    for perm in permutations:
+        L_perm=[]
+        profit_perm=0
+        cout_perm=0
+        i=0
+        camion_route=[]
+        while cout_perm<25*(10**9):
+            route=perm[i]
+            cout_perm += cout_route(route,x)[0]
+            camion_route=cout_route(route,x)[1]
+            profit_perm+=route[2]#je suppose que la compagnie de transport n'a pas assez d'argent pour couvrir tous les trajets, sinon la boucle ne se finit pas
+            L_perm.append((route,camion_route))
+        if profit_perm>profit_max and cout_perm<cout_min :
+            L=L_perm
+    return L
+
+#q18 a chaque trajet on associe le prix min du camion qui peut le faire puis on resoud programmation dynamique
 
 import numpy as np
 
@@ -486,7 +499,7 @@ def q18greedy(graph,camions,trajets,budjet):#la solution retournée n'est pas fo
                     indice=k
         l2.append(prixmin,chemin[2],indice,chemin[1])
     #l2 est une liste de quadruplet de la forme (prix,profit,camion,chemin) de chaque trajet
-    #on va maintenant trier les trajet de maniere decroissante en fonction de leur rapport profit/prix
+    #on va maintenant trier les trajets de maniere decroissante en fonction de leur rapport profit/prix
     lefficacite=[]
     for i in range(len(l2)):
         lefficacite.append((i,l2[i][1]/l2[i][0]))
@@ -515,3 +528,5 @@ def q18greedy(graph,camions,trajets,budjet):#la solution retournée n'est pas fo
             sol.append(l2[trajet][2],trajets[trajet])
             b-=l2[trajet[0]][0]
     return(sol)
+
+#print(Q14(g, 7, 35867))
