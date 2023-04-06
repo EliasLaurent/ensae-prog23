@@ -123,14 +123,13 @@ class Graph:
         return(liste_compconn)"""
 
     def get_path_with_power(self,debut,fin,p):
-        n=len(self.nodes)
+        n=self.nb_nodes
         visit=[0 for _ in range(n)]
         cc=self.CConnexes()
         for c in cc:
             if c.count(debut)==1:
                 if c.count(fin)==0:
                     return None
-        n=self.nb_nodes
         M=[[debut]]
         L=[debut]
         visit[debut-1]=1
@@ -416,7 +415,7 @@ def cout_route(route,x): #a une route du fichier network.x.in on associe le cout
 
 import itertools
 
-def q18grosbourrin(x):
+def q18violente(x):
     camions=trucks_from_file("input/trucks."+str(x)+".in")
     routes=routes_from_file(x)
     permutations=list(itertools.permutations(routes))
@@ -437,7 +436,7 @@ def q18grosbourrin(x):
             L_perm.append((route,camion_route))
         if profit_perm>profit_max and cout_perm<cout_min :
             L=L_perm
-    return L
+    return(L)
 
 #q18 a chaque trajet on associe le prix min du camion qui peut le faire puis on resoud programmation dynamique
 
